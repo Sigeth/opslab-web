@@ -1,5 +1,6 @@
 import { Alert, Card, Grid, Group, Skeleton, Stack, Tabs, Text, Title } from '@mantine/core';
 import { useParams } from '@tanstack/react-router';
+import { lazy, Suspense } from 'react';
 
 import { useChallenge, useInstances, useLatestCheck } from '../api/queries';
 import { CategoryBadge, DifficultyBadge } from '../components/Badges';
@@ -8,7 +9,11 @@ import { InstancePanel } from '../components/InstancePanel';
 import { Instructions } from '../components/Instructions';
 import { PageHeader } from '../components/PageHeader';
 import { TaskList } from '../components/TaskList';
-import { TerminalPanel } from '../components/TerminalPanel';
+
+// xterm.js is large: load it only when a terminal is shown.
+const TerminalPanel = lazy(() =>
+  import('../components/TerminalPanel').then((m) => ({ default: m.TerminalPanel })),
+);
 
 export function ChallengePage() {
   const { name } = useParams({ from: '/challenges/$name' });
@@ -74,7 +79,9 @@ export function ChallengePage() {
                   </Tabs.List>
                   {c.terminals.map((t) => (
                     <Tabs.Panel key={t.machine} value={t.machine} pt="xs">
-                      <TerminalPanel instance={instance.id} machine={t.machine} />
+                      <Suspense fallback={<Skeleton h={420} />}>
+                        <TerminalPanel instance={instance.id} machine={t.machine} />
+                      </Suspense>
                     </Tabs.Panel>
                   ))}
                 </Tabs>
