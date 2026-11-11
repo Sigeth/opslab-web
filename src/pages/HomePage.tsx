@@ -2,6 +2,7 @@ import { Alert, Badge, Card, Group, Skeleton, Text } from '@mantine/core';
 
 import { useVersion } from '../api/queries';
 import { PageHeader } from '../components/PageHeader';
+import { PROJECT_NAME } from '../project';
 
 export function HomePage() {
   const version = useVersion();
@@ -9,7 +10,7 @@ export function HomePage() {
   return (
     <>
       <PageHeader
-        title="Welcome to opslab"
+        title={`Welcome to ${PROJECT_NAME}`}
         description="Hands-on DevOps security challenges: Linux hardening, containers and Kubernetes."
       />
       <Card withBorder maw={480}>

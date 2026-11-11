@@ -2,6 +2,7 @@ import { AppShell, Group, NavLink, Title } from '@mantine/core';
 import { IconHome } from '@tabler/icons-react';
 import { Link, Outlet, useRouterState } from '@tanstack/react-router';
 
+import { PROJECT_NAME } from '../project';
 import { ColorSchemeToggle } from './ColorSchemeToggle';
 
 const navigation = [{ to: '/', label: 'Home', icon: IconHome }] as const;
@@ -14,7 +15,7 @@ export function AppLayout() {
     <AppShell header={{ height: 56 }} navbar={{ width: 220, breakpoint: 'sm' }} padding="lg">
       <AppShell.Header>
         <Group h="100%" px="md" justify="space-between">
-          <Title order={3}>opslab</Title>
+          <Title order={3}>{PROJECT_NAME}</Title>
           <ColorSchemeToggle />
         </Group>
       </AppShell.Header>
