@@ -24,6 +24,17 @@ jobs:
           verb: call
           args: nodejs --source=. check --targets=lint,test,verify-generated,build
 
+  licenses:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: dagger/dagger-for-github@v8.4.1
+        with:
+          version: '0.21.11'
+          module: github.com/Sigeth/opslab-ci@v0.1.0
+          verb: call
+          args: nodejs --source=. check --targets=licenses
+
   image:
     runs-on: ubuntu-latest
     steps:
