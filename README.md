@@ -2,14 +2,14 @@
 
 Web UI of opslab (working name). It's a React + Vite single-page app built with the [Mantine](https://mantine.dev) component library. The [api](https://github.com/Sigeth/opslab-api) serves the built files in production.
 
-> Status: M1. Login (solo mode), challenge catalog, and a challenge page with the instructions, the tasks, the environment (start, countdown, stop), browser terminals and a *Check my work* button. Live updates come from the api's server-sent events.
+> Status: M1. Login (solo mode), challenge catalog, and a challenge page with the instructions, the tasks, the environment (start, countdown, stop), browser terminals and a _Check my work_ button. Live updates come from the api's server-sent events.
 
 ## Pages and building blocks
 
-| Route | Page |
-|---|---|
-| `/login` | `LoginPage` |
-| `/` | `CatalogPage`: a `ChallengeCard` per challenge |
+| Route               | Page                                                                                                    |
+| ------------------- | ------------------------------------------------------------------------------------------------------- |
+| `/login`            | `LoginPage`                                                                                             |
+| `/`                 | `CatalogPage`: a `ChallengeCard` per challenge                                                          |
 | `/challenges/$name` | `ChallengePage`: `Instructions`, `TaskList`, `InstancePanel`, `TerminalPanel` (xterm.js), `CheckButton` |
 
 Terminals connect straight to the gateway (`wss://gw.<domain>/v1/terminal?token=…`) with a short-lived token from the api.
