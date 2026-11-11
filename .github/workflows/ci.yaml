@@ -2,7 +2,7 @@ name: ci
 
 # Pipelines live in github.com/Sigeth/opslab-ci (Dagger) and run the targets
 # of this repository's Makefile. Run them locally with:
-#   dagger -m github.com/Sigeth/opslab-ci@v0.1.0 call nodejs --source=. check --targets=lint,test,verify-generated,build
+#   dagger -m github.com/Sigeth/opslab-ci@v0.2.0 call nodejs --source=. check --targets=lint,test,verify-generated,build
 
 on:
   push:
@@ -20,7 +20,7 @@ jobs:
       - uses: dagger/dagger-for-github@v8.4.1
         with:
           version: '0.21.11'
-          module: github.com/Sigeth/opslab-ci@v0.1.0
+          module: github.com/Sigeth/opslab-ci@v0.2.0
           verb: call
           args: nodejs --source=. check --targets=lint,test,verify-generated,build
 
@@ -31,7 +31,7 @@ jobs:
       - uses: dagger/dagger-for-github@v8.4.1
         with:
           version: '0.21.11'
-          module: github.com/Sigeth/opslab-ci@v0.1.0
+          module: github.com/Sigeth/opslab-ci@v0.2.0
           verb: call
           args: nodejs --source=. check --targets=licenses
 
@@ -42,6 +42,6 @@ jobs:
       - uses: dagger/dagger-for-github@v8.4.1
         with:
           version: '0.21.11'
-          module: github.com/Sigeth/opslab-ci@v0.1.0
+          module: github.com/Sigeth/opslab-ci@v0.2.0
           verb: call
           args: image --source=.
