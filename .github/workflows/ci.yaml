@@ -1,0 +1,36 @@
+name: ci
+
+# Pipelines live in github.com/Sigeth/opslab-ci (Dagger) and run the targets
+# of this repository's Makefile. Run them locally with:
+#   dagger -m github.com/Sigeth/opslab-ci@v0.1.0 call nodejs --source=. check --targets=lint,test,verify-generated,build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: dagger/dagger-for-github@v8.4.1
+        with:
+          version: '0.21.11'
+          module: github.com/Sigeth/opslab-ci@v0.1.0
+          verb: call
+          args: nodejs --source=. check --targets=lint,test,verify-generated,build
+
+  image:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: dagger/dagger-for-github@v8.4.1
+        with:
+          version: '0.21.11'
+          module: github.com/Sigeth/opslab-ci@v0.1.0
+          verb: call
+          args: image --source=.
