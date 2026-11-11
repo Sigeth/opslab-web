@@ -4,6 +4,182 @@
  */
 
 export interface paths {
+    "/api/v1/auth/login": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Signs in with a local account. */
+        post: operations["login"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auth/logout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Signs out. */
+        post: operations["logout"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/challenges": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Installed challenges, with the user's progress. */
+        get: operations["list_challenges"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/challenges/{name}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A challenge, with its instructions and tasks. */
+        get: operations["get_challenge"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Server-sent events of the signed-in user (instances and checks). See the
+         *     `Event` schema.
+         */
+        get: operations["events"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/instances": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The user's active instances. */
+        get: operations["list_instances"];
+        put?: never;
+        /** Starts a challenge. A user has one active instance at a time. */
+        post: operations["start_instance"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/instances/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** An instance of the user. */
+        get: operations["get_instance"];
+        put?: never;
+        post?: never;
+        /** Stops an instance. Everything in it is lost; scores are kept. */
+        delete: operations["stop_instance"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/instances/{id}/checks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The latest check of an instance. */
+        get: operations["latest_check"];
+        put?: never;
+        /** Checks every task of an instance. Results arrive as events. */
+        post: operations["start_check"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/instances/{id}/terminals": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Opens a terminal: returns the gateway URL with a short-lived token. */
+        post: operations["open_terminal"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The signed-in user and their score. */
+        get: operations["me"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/version": {
         parameters: {
             query?: never;
@@ -25,6 +201,147 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** @description A challenge with its instructions and tasks. */
+        ChallengeDetail: components["schemas"]["ChallengeSummary"] & {
+            /** @description Student instructions, in markdown. */
+            instructions?: string | null;
+            taskList: components["schemas"]["TaskView"][];
+            terminals: components["schemas"]["TerminalView"][];
+        };
+        /** @description A challenge in the catalog. */
+        ChallengeSummary: {
+            /** @description linux-hardening, containers or kubernetes. */
+            category: string;
+            /** @description easy, medium, hard or insane. */
+            difficulty: string;
+            /**
+             * Format: int64
+             * @description Typical time to solve, in minutes.
+             */
+            estimatedMinutes?: number | null;
+            name: string;
+            /**
+             * Format: int64
+             * @description Points of all tasks.
+             */
+            points: number;
+            /** @description False when this cluster cannot run the challenge. */
+            runnable: boolean;
+            /**
+             * Format: int64
+             * @description Points the user has already scored.
+             */
+            solvedPoints: number;
+            solvedTasks: number;
+            summary: string;
+            tags: string[];
+            tasks: number;
+            title: string;
+            unrunnableReason?: string | null;
+            version: string;
+        };
+        /**
+         * @description Lifecycle phase of a check run.
+         * @enum {string}
+         */
+        CheckPhase: "Pending" | "Running" | "Completed" | "Error";
+        /** @description A validation of an instance. */
+        CheckRunView: {
+            id: string;
+            instance: string;
+            /** @description Explains an Error phase. */
+            message?: string | null;
+            /** @description Tasks this run solved for the first time. */
+            newlySolved: string[];
+            phase: components["schemas"]["CheckPhase"];
+            results: components["schemas"]["TaskResultView"][];
+        };
+        /** @description Body of every error response. */
+        ErrorBody: {
+            /** @description What went wrong, for humans. */
+            error: string;
+        };
+        /** @description Pushed on GET /api/v1/events (server-sent events, one JSON object per message). */
+        Event: {
+            instance: components["schemas"]["InstanceView"];
+            /** @enum {string} */
+            type: "instance";
+        } | {
+            id: string;
+            /** @enum {string} */
+            type: "instanceDeleted";
+        } | {
+            check: components["schemas"]["CheckRunView"];
+            /** @enum {string} */
+            type: "check";
+        };
+        /**
+         * @description Lifecycle phase of an instance.
+         * @enum {string}
+         */
+        InstancePhase: "Queued" | "Provisioning" | "Ready" | "Expired" | "Failed" | "Stopping";
+        /** @description A running attempt of the user. */
+        InstanceView: {
+            challenge: string;
+            /** Format: date-time */
+            expiresAt?: string | null;
+            /** @description Instance name, used in /instances/{id} paths. */
+            id: string;
+            /** @description Why the instance is in its phase (progress, failure reason...). */
+            message?: string | null;
+            phase: components["schemas"]["InstancePhase"];
+            terminals: components["schemas"]["TerminalView"][];
+        };
+        LoginRequest: {
+            password: string;
+            username: string;
+        };
+        /** @description The signed-in user. */
+        Me: {
+            displayName: string;
+            /** Format: uuid */
+            id: string;
+            /** @description admin, teacher or student. */
+            role: string;
+            /**
+             * Format: int64
+             * @description Points of every solved task.
+             */
+            score: number;
+            username: string;
+        };
+        OpenTerminal: {
+            /** @description Machine of one of the challenge's terminals. */
+            machine: string;
+        };
+        StartInstance: {
+            /** @description Name of the challenge. */
+            challenge: string;
+        };
+        /** @description Result of checking one task. */
+        TaskResultView: {
+            message?: string | null;
+            passed: boolean;
+            task: string;
+        };
+        /** @description A gradable objective. */
+        TaskView: {
+            id: string;
+            /** Format: int32 */
+            points: number;
+            solved: boolean;
+            title: string;
+        };
+        /** @description Where the browser opens a terminal. */
+        TerminalAccess: {
+            /** @description WebSocket URL of the gateway, with a short-lived token. */
+            url: string;
+        };
+        /** @description A terminal offered on a machine. */
+        TerminalView: {
+            label: string;
+            machine: string;
+        };
         /** @description Version of the running api. */
         VersionInfo: {
             /** @description Project name. */
@@ -41,6 +358,376 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    login: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LoginRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Me"];
+                };
+            };
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
+    logout: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    list_challenges: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChallengeSummary"][];
+                };
+            };
+        };
+    };
+    get_challenge: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Challenge name */
+                name: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChallengeDetail"];
+                };
+            };
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
+    events: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description text/event-stream of Event JSON objects */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/event-stream": unknown;
+                };
+            };
+        };
+    };
+    list_instances: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InstanceView"][];
+                };
+            };
+        };
+    };
+    start_instance: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StartInstance"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InstanceView"];
+                };
+            };
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
+    get_instance: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Instance ID */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InstanceView"];
+                };
+            };
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
+    stop_instance: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Instance ID */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
+    latest_check: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Instance ID */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CheckRunView"] | null;
+                };
+            };
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
+    start_check: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Instance ID */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CheckRunView"];
+                };
+            };
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
+    open_terminal: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Instance ID */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OpenTerminal"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TerminalAccess"];
+                };
+            };
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
+    me: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Me"];
+                };
+            };
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
     version: {
         parameters: {
             query?: never;
